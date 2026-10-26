@@ -6,3 +6,13 @@ combining card-based combat, exploration, and resource management.
 
 `Players` escape the Witch’s house, survive a dangerous forest, and navigate branching paths to reach freedom.
 
+### Navigation: 
+
+- Witch house
+- Forest
+- Shop
+- Blacksmith
+- Final Boss
+- EXIT
+
+
