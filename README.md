@@ -15,4 +15,8 @@ combining card-based combat, exploration, and resource management.
 - Final Boss
 - EXIT
 
+## Third-Party package: 
+> Using Unity's package manager
 
+- ProBuilder (more versatile 3d)
+- Cinemachine (camera extension)
