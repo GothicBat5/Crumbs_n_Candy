@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -34,9 +33,7 @@ public class PlayerMovement : MonoBehaviour
             return;
 
         float mouseX = Mouse.current.delta.x.ReadValue();
-
         rotationY += mouseX * mouseSensitivity * Time.deltaTime;
-
         transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
     }
 
