@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
@@ -8,9 +9,13 @@ public class DoorExit : MonoBehaviour
     [SerializeField] private GameObject prompt;
 
     private bool playerNearby;
+    private bool isTransitioning;
 
     private void Start()
     {
+        playerNearby = false;
+        isTransitioning = false;
+
         if (prompt != null)
         {
             prompt.SetActive(false);
@@ -19,35 +24,46 @@ public class DoorExit : MonoBehaviour
 
     private void Update()
     {
-        if (playerNearby && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (!playerNearby || isTransitioning)
+            return;
+
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
+            isTransitioning = true;
+
+            Debug.Log("E pressed. Loading scene index: " + sceneIndex);
+
             SceneManager.LoadScene(sceneIndex);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerNearby = true;
+        if (!other.CompareTag("Player"))
+            return;
 
-            if (prompt != null)
-            {
-                prompt.SetActive(true);
-            }
+        playerNearby = true;
+
+        Debug.Log("Player entered door trigger.");
+
+        if (prompt != null)
+        {
+            prompt.SetActive(true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerNearby = false;
+        if (!other.CompareTag("Player"))
+            return;
 
-            if (prompt != null)
-            {
-                prompt.SetActive(false);
-            }
+        playerNearby = false;
+
+        Debug.Log("Player exited door trigger.");
+
+        if (prompt != null)
+        {
+            prompt.SetActive(false);
         }
     }
 }
