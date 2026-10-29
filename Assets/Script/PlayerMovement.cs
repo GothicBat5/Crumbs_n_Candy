@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,41 +9,35 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float gravity = -9.81f;
 
-    [Header("Mouse Look")]
-    [SerializeField] private Transform playerCamera;
-    [SerializeField] private float mouseSensitivity = 0.1f;
+    [Header("Mouse Rotation")]
+    [SerializeField] private float mouseSensitivity = 150f;
 
     private CharacterController controller;
     private float verticalVelocity;
-    private float cameraPitch;
+    private float rotationY;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-    }
-
-    private void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        rotationY = transform.eulerAngles.y;
     }
 
     private void Update()
     {
+        HandleMouseRotation();
         HandleMovement();
-        HandleMouseLook();
+    }
 
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+    private void HandleMouseRotation()
+    {
+        if (Mouse.current == null)
+            return;
 
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
+        float mouseX = Mouse.current.delta.x.ReadValue();
+
+        rotationY += mouseX * mouseSensitivity * Time.deltaTime;
+
+        transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
     }
 
     private void HandleMovement()
@@ -58,38 +53,16 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.sKey.isPressed) z -= 1f;
         if (Keyboard.current.wKey.isPressed) z += 1f;
 
-        Vector3 direction = transform.right * x + transform.forward * z;
-
-        direction = Vector3.ClampMagnitude(direction, 1f);
+        Vector3 input = Vector3.ClampMagnitude(new Vector3(x, 0f, z), 1f);
 
         if (controller.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        Vector3 velocity = direction * moveSpeed + Vector3.up * verticalVelocity;
+        Vector3 movement = transform.right * input.x + transform.forward * input.z;
+        Vector3 velocity = movement * moveSpeed + Vector3.up * verticalVelocity;
 
         controller.Move(velocity * Time.deltaTime);
-    }
-
-    private void HandleMouseLook()
-    {
-        if (Mouse.current == null || Cursor.lockState != CursorLockMode.Locked)
-            return;
-
-        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-
-        float mouseX = mouseDelta.x * mouseSensitivity;
-        float mouseY = mouseDelta.y * mouseSensitivity;
-
-        transform.Rotate(Vector3.up * mouseX);
-
-        cameraPitch -= mouseY;
-        cameraPitch = Mathf.Clamp(cameraPitch, -85f, 85f);
-
-        if (playerCamera != null)
-        {
-            playerCamera.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
-        }
     }
 }
